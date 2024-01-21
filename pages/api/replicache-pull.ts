@@ -311,10 +311,10 @@ export async function replicachePullInner(
       rows: [{ cookie }],
     } = await pgClient.query(
       `SELECT MAX(max) as cookie FROM (
-SELECT MAX(version) from "Presence" WHERE "wrappedFeatureCollectionId" = $1
-UNION SELECT MAX(version) from "WrappedFeature" WHERE "wrappedFeatureCollectionId" = $1
-UNION SELECT MAX(version) from "LayerConfig" WHERE "wrappedFeatureCollectionId" = $1
-UNION SELECT MAX(version) from "Folder" WHERE "wrappedFeatureCollectionId" = $1) as m;
+SELECT MAX(version) from placemark."Presence" WHERE "wrappedFeatureCollectionId" = $1
+UNION SELECT MAX(version) from placemark."WrappedFeature" WHERE "wrappedFeatureCollectionId" = $1
+UNION SELECT MAX(version) from placemark."LayerConfig" WHERE "wrappedFeatureCollectionId" = $1
+UNION SELECT MAX(version) from placemark."Folder" WHERE "wrappedFeatureCollectionId" = $1) as m;
 `,
       [wrappedFeatureCollectionId]
     );
