@@ -140,6 +140,7 @@ export function makeLayers({
       source: FEATURES_SOURCE_NAME,
       filter: CONTENT_LAYER_FILTERS[FEATURES_FILL_LAYER_NAME],
       paint: FILL_PAINT(symbolization),
+      slot: "top",
     },
 
     // Real lines, from the dataset.
@@ -149,6 +150,7 @@ export function makeLayers({
       source: FEATURES_SOURCE_NAME,
       filter: CONTENT_LAYER_FILTERS[FEATURES_LINE_LAYER_NAME],
       paint: LINE_PAINT(symbolization),
+      slot: "top",
     },
 
     {
@@ -157,6 +159,7 @@ export function makeLayers({
       source: EPHEMERAL_SOURCE_NAME,
       filter: ["==", "$type", "Polygon"],
       paint: FILL_PAINT(symbolization),
+      slot: "top",
     },
 
     // Real lines, from the dataset.
@@ -170,6 +173,7 @@ export function makeLayers({
         ["==", "$type", "Polygon"],
       ],
       paint: LINE_PAINT(symbolization),
+      slot: "top",
     },
 
     // Real points, from the dataset.
@@ -180,6 +184,7 @@ export function makeLayers({
       layout: CIRCLE_LAYOUT,
       filter: CONTENT_LAYER_FILTERS[FEATURES_POINT_LAYER_NAME],
       paint: CIRCLE_PAINT(symbolization, true),
+      slot: "top",
     },
 
     // Real points, from the dataset.
@@ -190,6 +195,7 @@ export function makeLayers({
       layout: CIRCLE_LAYOUT,
       filter: CONTENT_LAYER_FILTERS[FEATURES_POINT_LAYER_NAME],
       paint: CIRCLE_PAINT(symbolization),
+      slot: "top",
     },
 
     ...(typeof previewProperty === "string"
@@ -204,6 +210,7 @@ export function makeLayers({
               CONTENT_LAYER_FILTERS[FEATURES_POINT_LAYER_NAME],
               previewProperty
             ),
+            slot: "top",
           } as mapboxgl.AnyLayer,
           {
             id: FEATURES_LINE_LABEL_LAYER_NAME,
@@ -215,6 +222,7 @@ export function makeLayers({
               CONTENT_LAYER_FILTERS[FEATURES_LINE_LAYER_NAME],
               previewProperty
             ),
+            slot: "top",
           } as mapboxgl.AnyLayer,
           {
             id: FEATURES_FILL_LABEL_LAYER_NAME,
@@ -226,6 +234,7 @@ export function makeLayers({
               CONTENT_LAYER_FILTERS[FEATURES_FILL_LAYER_NAME],
               previewProperty
             ),
+            slot: "top",
           } as mapboxgl.AnyLayer,
         ]
       : []),

@@ -135,6 +135,7 @@ export const MapComponent = memo(function MapComponent({
                   visibility: true,
                   opacity: 1,
                   tms: false,
+                  slot: "middle",
                   id: newFeatureId(),
                 },
               ],

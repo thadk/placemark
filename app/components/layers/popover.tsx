@@ -76,6 +76,7 @@ const SHARED_INTIAL_VALUES = {
   token: "",
   visibility: true,
   tms: false,
+  slot: "middle",
   opacity: 1,
 } as const;
 
@@ -218,6 +219,7 @@ function MapboxLayer({
               visibility: true,
               tms: false,
               opacity: 1,
+              slot: "middle",
               at: oldAt || getNextAt(items),
               id: newFeatureId(),
             },
@@ -286,6 +288,7 @@ function CopyLayer({ onDone }: { onDone?: () => void }) {
                           ...config,
                           visibility: true,
                           tms: false,
+                          slot: "middle",
                           opacity: 1,
                           at: getNextAt(items),
                           id: newFeatureId(),
@@ -542,6 +545,7 @@ function AddLayer() {
                   ...layer,
                   visibility: true,
                   tms: false,
+                  slot: "middle",
                   opacity: 1,
                   at: oldAt || nextAt,
                   id: newFeatureId(),
