@@ -77,7 +77,7 @@ export async function replicachePushInner(
     const [targetCollection] = affectedFeatureCollections;
 
     const permission = await client.query(
-      `SELECT id FROM "WrappedFeatureCollection"
+      `SELECT id FROM placemark."WrappedFeatureCollection"
                             WHERE id = $1 AND "organizationId" = $2`,
       [targetCollection, session.orgId]
     );
@@ -90,13 +90,13 @@ export async function replicachePushInner(
     const {
       rows: [{ version }],
     } = await client.query<{ version: number }>(
-      `INSERT INTO "ReplicacheVersionSingleton" (id, version) VALUES (0, 0) ON CONFLICT (id) DO UPDATE SET version = "ReplicacheVersionSingleton".version + 1 RETURNING version;`
+      `INSERT INTO placemark."ReplicacheVersionSingleton" (id, version) VALUES (0, 0) ON CONFLICT (id) DO UPDATE SET version = placemark."ReplicacheVersionSingleton".version + 1 RETURNING version;`
     );
 
     const replicacheClientResult = await client.query<{
       lastMutationId: number;
     }>(
-      `INSERT INTO "ReplicacheClient" (id, "userId", "updatedAt", "lastMutationId") VALUES ($1, $2, NOW(), 0) ON CONFLICT (id) DO UPDATE SET "updatedAt" = EXCLUDED."updatedAt" RETURNING "lastMutationId";`,
+      `INSERT INTO placemark."ReplicacheClient" (id, "userId", "updatedAt", "lastMutationId") VALUES ($1, $2, NOW(), 0) ON CONFLICT (id) DO UPDATE SET "updatedAt" = EXCLUDED."updatedAt" RETURNING "lastMutationId";`,
       [push.clientID, session.userId]
     );
 
@@ -141,7 +141,7 @@ export async function replicachePushInner(
     }
 
     await client.query(
-      `UPDATE "ReplicacheClient" SET "lastMutationId" = $1 WHERE id = $2`,
+      `UPDATE placemark."ReplicacheClient" SET "lastMutationId" = $1 WHERE id = $2`,
       [lastMutationId, push.clientID]
     );
 
