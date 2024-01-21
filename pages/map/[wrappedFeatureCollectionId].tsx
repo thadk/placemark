@@ -18,6 +18,7 @@ import { UIDMap } from "app/lib/id_mapper";
 import ReconnectingEventSource from "reconnecting-eventsource";
 import { useWatchCallback } from "app/hooks/use_watch_callback";
 import { DialogState } from "state/dialog_state";
+import { DevTools } from "jotai-devtools";
 
 function PersistedMapInner({ userId }: { userId: number }) {
   const idMap = useRef(UIDMap.empty());
@@ -139,6 +140,7 @@ const PersistedMap: BlitzPage<{ userId: number }> = ({ userId }) => {
   return (
     <Provider key={wrappedFeatureCollectionId} store={store}>
       <PersistedMapInner userId={userId} />
+      <DevTools store={store} options={{ shouldShowPrivateAtoms: true }} />
     </Provider>
   );
 };
