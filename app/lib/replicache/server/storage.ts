@@ -33,7 +33,7 @@ export class ServerStorage implements IStorage {
 
   async deleteFolders(ids: string[], wrappedFeatureCollectionId: string) {
     await this.client.query(
-      `UPDATE "Folder" SET
+      `UPDATE placemark."Folder" SET
       version = $1,
       "updatedAt" = NOW(),
       deleted = true
@@ -44,7 +44,7 @@ export class ServerStorage implements IStorage {
     );
 
     await this.client.query(
-      `UPDATE "WrappedFeature" SET
+      `UPDATE placemark."WrappedFeature" SET
       version = $1,
       "updatedAt" = NOW(),
       "folderId" = NULL
@@ -76,9 +76,10 @@ export class ServerStorage implements IStorage {
       // Get the folder’s parent's parent
       const { rows } = await this.client.query<{
         folderId: string | null;
-      }>(`SELECT "folderId" FROM "Folder" WHERE "Folder"."id" = $1::uuid`, [
-        folderId,
-      ]);
+      }>(
+        `SELECT placemark."folderId" FROM placemark."Folder" WHERE placemark."Folder"."id" = $1::uuid`,
+        [folderId]
+      );
       if (!rows.length) {
         // console.log("Accepted folder input because no rows", folderId);
         return true;
@@ -131,7 +132,7 @@ export class ServerStorage implements IStorage {
     );
 
     await this.client.query(
-      `INSERT INTO "Folder"
+      `INSERT INTO placemark."Folder"
       (version, "wrappedFeatureCollectionId", id, deleted, "updatedAt", name, visibility, at, "folderId", expanded, locked, "createdById")
       SELECT * from UNNEST
       ($1::int[], $2::text[], $3::uuid[], $4::boolean[], $5::timestamp[], $6::text[], $7::boolean[], $8::text[], $9::uuid[], $10::boolean[], $11::boolean[], $12::int[])
@@ -156,7 +157,7 @@ export class ServerStorage implements IStorage {
   async deleteFeatures(ids: string[], wrappedFeatureCollectionId: string) {
     await this.enforceFeatureCollection(wrappedFeatureCollectionId);
     await this.client.query(
-      `UPDATE "WrappedFeature" SET
+      `UPDATE placemark."WrappedFeature" SET
       version = $1,
       "updatedAt" = NOW(),
       deleted = true
@@ -183,7 +184,7 @@ export class ServerStorage implements IStorage {
     } = presence;
 
     await this.client.query(
-      `INSERT INTO "Presence" (
+      `INSERT INTO placemark."Presence" (
       pitch,
       bearing,
       minx,
@@ -229,7 +230,7 @@ export class ServerStorage implements IStorage {
     );
 
     await this.client.query(
-      `UPDATE "Presence" SET version = $1, deleted = true, "updatedAt" = NOW() WHERE "updatedAt" < (NOW() - INTERVAL '5 minutes') AND deleted = FALSE;`,
+      `UPDATE placemark."Presence" SET version = $1, deleted = true, "updatedAt" = NOW() WHERE "updatedAt" < (NOW() - INTERVAL '5 minutes') AND deleted = FALSE;`,
       [this.version]
     );
 
@@ -265,7 +266,7 @@ export class ServerStorage implements IStorage {
     const batches = chunk(args, INSERT_CHUNK_SIZE);
     for (const batch of batches) {
       await this.client.query(
-        `INSERT INTO "WrappedFeature"
+        `INSERT INTO placemark."WrappedFeature"
       (feature, at, version, "wrappedFeatureCollectionId", id, "createdById", deleted, "updatedAt", "folderId")
       SELECT * from UNNEST
       ($1::jsonb[], $2::text[], $3::int[], $4::text[], $5::uuid[], $6::int[], $7::boolean[], $8::timestamp[], $9::uuid[])
@@ -294,7 +295,7 @@ export class ServerStorage implements IStorage {
     }
 
     const { rows } = await this.client.query(
-      `SELECT id FROM "WrappedFeatureCollection"
+      `SELECT id FROM placemark."WrappedFeatureCollection"
                             WHERE id = $1 AND "organizationId" = $2`,
       [wrappedFeatureCollectionId, this.session.orgId]
     );
@@ -334,8 +335,11 @@ export class ServerStorage implements IStorage {
       })
     );
 
+    // needed for "MapboxLayerType" to find it in the alternative schema
+    await this.client.query("SET search_path TO 'placemark';");
+
     await this.client.query(
-      `INSERT INTO "LayerConfig"
+      `INSERT INTO placemark."LayerConfig"
       (version,   "wrappedFeatureCollectionId", id,         deleted,       "updatedAt",     opacity,    visibility,     at,        url,         type,                     name,        token,       tms)
       SELECT * from UNNEST
       ($1::int[], $2::text[],                   $3::uuid[], $4::boolean[], $5::timestamp[], $6::float[], $7::boolean[], $8::text[], $9::text[], $10::"MapboxLayerType"[], $11::text[], $12::text[], $13::boolean[])
@@ -357,6 +361,7 @@ export class ServerStorage implements IStorage {
       `,
       zip(...args)
     );
+    await this.client.query("COMMIT");
 
     return;
   }
@@ -364,7 +369,7 @@ export class ServerStorage implements IStorage {
   async deleteLayerConfigs(ids: string[], wrappedFeatureCollectionId: string) {
     await this.enforceFeatureCollection(wrappedFeatureCollectionId);
     await this.client.query(
-      `UPDATE "LayerConfig" SET
+      `UPDATE placemark."LayerConfig" SET
       version = $1,
       "updatedAt" = NOW(),
       deleted = true

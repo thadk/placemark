@@ -22,6 +22,14 @@ the best way to get me – I'll get notifications for new issues.
 
 ---
 
+To fix DeckGL v9 for Mapbox 3.1, patch line 17 of `placemark/node_modules/@deck.gl/layers/dist/es5/text-layer/font-atlas-manager.js` with
+```
+let _tinySdf;
+import('@mapbox/tiny-sdf').then((module) => {
+ _tinySdf = module;
+});
+```
+
 See [docs/architecture.md](./docs/architecture.md) for notes on
 the technologies under the hood.
 

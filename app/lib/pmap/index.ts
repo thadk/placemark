@@ -35,8 +35,8 @@ import { colorFromPresence } from "app/lib/color";
 import type { Presence } from "@prisma/client";
 import { IDMap } from "app/lib/id_mapper";
 import { shallowArrayEqual } from "app/lib/utils";
-import { MapboxOverlay } from "@deck.gl/mapbox/typed";
-import { PolygonLayer, ScatterplotLayer } from "@deck.gl/layers/typed";
+import { MapboxOverlay } from "@deck.gl/mapbox";
+import { PolygonLayer, ScatterplotLayer } from "@deck.gl/layers";
 
 const MAP_OPTIONS: Omit<mapboxgl.MapboxOptions, "container"> = {
   style: { version: 8, layers: [], sources: {} },
@@ -213,6 +213,64 @@ export default class PMap {
       layerConfigs,
       symbolization,
       previewProperty: previewProperty,
+    });
+    map.on("style.load", () => {
+      console.log("layerConfigs", layerConfigs);
+      try {
+        map.setConfigProperty("basemap", "lightPreset", "dusk");
+        map.setConfigProperty("basemap", "showTransitLabels", "true");
+
+        // void this.setStyle({
+        //   layerConfigs,
+        //   symbolization,
+        //   previewProperty: previewProperty,
+        // });
+      } catch (error) {}
+
+      map.addSource("mapbox-dem", {
+        type: "raster-dem",
+        url: "mapbox://mapbox.mapbox-terrain-dem-v1",
+        tileSize: 512,
+        maxzoom: 14,
+      });
+
+      /** PARIS EXAMPLE FROM DEMO
+       * https://docs.mapbox.com/mapbox-gl-js/example/set-config-property/
+       */
+      map.addSource("line", {
+        type: "geojson",
+        lineMetrics: true,
+        data: {
+          type: "LineString",
+          coordinates: [
+            [2.293389857555951, 48.85896319631851],
+            [2.2890810326441624, 48.86174223718291],
+          ],
+        },
+      });
+
+      map.addLayer({
+        id: "line",
+        source: "line",
+        type: "line",
+        paint: {
+          "line-width": 12,
+          // The `*-emissive-strength` properties control the intensity of light emitted on the source features.
+          // To enhance the visibility of a line in darker light presets, increase the value of `line-emissive-strength`.
+          "line-emissive-strength": 0.8,
+          "line-gradient": [
+            "interpolate",
+            ["linear"],
+            ["line-progress"],
+            0,
+            "red",
+            1,
+            "blue",
+          ],
+        },
+      });
+      // add the DEM source as a terrain layer with exaggerated height
+      map.setTerrain({ source: "mapbox-dem", exaggeration: 1.5 });
     });
   }
 

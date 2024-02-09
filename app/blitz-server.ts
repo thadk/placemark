@@ -45,6 +45,7 @@ export const { gSSP, gSP, api } = setupBlitzServer({
           res.end();
           return;
         }
+        console.log("500 middleware failure: ", e);
         res.statusCode = 500;
         res.send({ error: "Internal error" });
         res.end();

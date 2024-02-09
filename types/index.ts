@@ -64,6 +64,7 @@ export const zLayerConfigCommon = z.object({
   opacity: z.number().transform((num) => clamp(num, 0, 1)),
   tms: z.optional(z.boolean()).default(false),
   visibility: z.boolean(),
+  slot: z.optional(z.enum(["top", "middle", "bottom"])),
 });
 
 const url = z.string().url();

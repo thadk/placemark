@@ -33,6 +33,7 @@ export async function addMapboxStyle(
         glyphs: "mapbox://fonts/mapbox/{fontstack}/{range}.pbf",
         sources: {},
         layers: [],
+        slot: "middle",
       };
     });
 
@@ -110,6 +111,7 @@ export function addXYZStyle(
   const newLayer = {
     id: layerId,
     source: sourceId,
+    slot: "bottom",
     ...paintLayoutFromRasterLayer(layer),
   } as mapboxgl.AnyLayer;
 
